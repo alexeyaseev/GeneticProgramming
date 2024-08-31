@@ -1,39 +1,40 @@
 import datetime
-import unittest
+import genetic
 import random
 
-import genetic
 
-class GuessPasswordTests(unittest.TestCase):
-    geneset = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!."
-    def test_Random(self):
-        length = 150
-        target = ''.join(random.choice(self.geneset) for _ in range(length))
-        target = "I do not know the answer"
+class TestGuessPassword():
+    geneset = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,"
+
+    def test_Hello_World(self):
+        target = "Hello World!"
         self.guess_password(target)
 
-    def _test_benchmark(self):
-        genetic.Benchmark.run(self._test_Random)
+    def test_For_I_am_fearfully_and_wonderfully_made(self):
+        target = "For I am fearfully and wonderfully made."
+        self.guess_password(target)
+
+    def test_Random(self):
+        length = 100
+        target = ''.join(random.choice(self.geneset) for _ in range(length))
+        self.guess_password(target)
+
+    def test_benchmark(self):
+        genetic.Benchmark.run(self.test_Random)
 
     def guess_password(self, target):
-         def fnGetFitness(genes):
-             return get_fitness(genes, target)
-         def fnDisplay(candidate):
-             display(candidate, startTime)
-
-         startTime = datetime.datetime.now()
-         optimalFitness = len(target)
-         best = genetic.get_best(fnGetFitness, len(target), optimalFitness, self.geneset, fnDisplay)
-         self.assertEqual(''.join(best.Genes), target)
+        startTime = datetime.datetime.now()
+        def fnGetFitness(genes):
+            return get_fitness(genes, target)
+        def fnDisplay(candidate):
+            display(candidate, startTime)
+        optimalFitness = len(target)
+        best = genetic.get_best(fnGetFitness, len(target), optimalFitness, self.geneset,fnDisplay)
+        assert ''.join(best.Genes) == target
 
 def display(candidate, startTime):
     timeDiff = datetime.datetime.now() - startTime
     print("{0}\t{1}\t{2}".format(''.join(candidate.Genes), candidate.Fitness, str(timeDiff)))
 
 def get_fitness(genes, target):
-    return sum(1 for expected, actual in zip(target, genes)
-               if expected == actual)
-
-if __name__ == "__main__":
-    unittest.main()
-    #test_Hello_World()
+    return sum(1 for expected, actual in zip(target, genes) if expected == actual)
